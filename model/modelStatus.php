@@ -1,13 +1,11 @@
 <?php
-
-class modelStatus{
-
-    public function listarStatus(){
+class modelStatus {
+    public function listarStatus() {
         try {
-            $pdo = Database::conexao();
-            $consulta = $pdo->query("SELECT * FROM tbl_status");
-            $lista = $consulta->fetchAll(PDO::FETCH_ASSOC);
-            return $lista;
+            $conn = Database::conexao();
+            $consulta = $conn->query("SELECT * FROM tbl_status");
+            $resultado = $consulta->fetchAll(PDO::FETCH_ASSOC);
+            return $resultado;
         } catch (PDOException $e) {
             return false;
         }
@@ -15,18 +13,27 @@ class modelStatus{
 
     public function cadastrarStatus($descricao) {
         try {
+            $conn = Database::conexao();
+            $inserir = $conn->prepare("INSERT INTO tbl_status (descricao) VALUES (:descricao)");
+            $inserir->bindParam(':descricao', $descricao);
+            $inserir->execute();
+            return true;
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
 
-            $descricao_filtro = filter_var($descricao, FILTER_SANITIZE_STRING);
-
-            $pdo = Database::conexao();
-            $cadastrar = $pdo->prepare("INSERT INTO tbl_status(descricao) VALUES (:descricao)");
-            $cadastrar->bindParam(":descricao", $descricao_filtro);
-
-            $cadastrar->execute();
-
+    public function atualizarStatus($id_status, $descricao) {
+        try {
+            $conn = Database::conexao();
+            $atualizar = $conn->prepare("UPDATE tbl_status SET descricao = :descricao WHERE id_status = :id_status");
+            $atualizar->bindParam(':id_status', $id_status);
+            $atualizar->bindParam(':descricao', $descricao);
+            $atualizar->execute();
             return true;
         } catch (PDOException $e) {
             return false;
         }
     }
 }
+?>
